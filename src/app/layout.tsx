@@ -23,8 +23,10 @@ import { PayPalProvider } from "@/components/PayPalProvider";
 import { UIProvider } from "@/context/UIContext";
 import MobileBottomBar from "@/components/Navigation/MobileBottomBar";
 import { GlobalPurchaseModal } from "@/components/GlobalPurchaseModal"; // Import from new file
+import { OnboardingModal } from "@/components/Auth/OnboardingModal";
 import { Toaster } from 'sonner';
 import CookieBanner from "@/components/CookieBanner";
+import { PerformanceMonitor } from "@/components/PerformanceMonitor";
 
 
 export default function RootLayout({
@@ -38,6 +40,7 @@ export default function RootLayout({
         <AuthProvider>
           <UIProvider>
             <PayPalProvider>
+              <PerformanceMonitor />
               <main className="pt-20 min-h-screen relative overflow-hidden pb-24 md:pb-0">
                 {/* Background Elements */}
                 <div className="fixed inset-0 z-0 pointer-events-none">
@@ -53,6 +56,7 @@ export default function RootLayout({
 
                 <MobileBottomBar />
                 <GlobalPurchaseModal />
+                <OnboardingModal />
                 <Toaster position="top-center" theme="dark" richColors closeButton />
               </main>
             </PayPalProvider>

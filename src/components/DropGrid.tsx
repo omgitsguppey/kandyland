@@ -67,27 +67,19 @@ export function DropGrid({ drops: propDrops, loading: propLoading, isSearching }
 
     return (
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 pb-20 md:pb-0">
-            <AnimatePresence mode="popLayout">
-                {drops.map((drop, index) => (
-                    <motion.div
-                        key={drop.id}
-                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-                        transition={{
-                            duration: 0.4,
-                            ease: "easeOut",
-                            delay: index * 0.05 // Stagger effect
-                        }}
-                    >
-                        {(drop.type === 'promo' || drop.type === 'external') ? (
-                            <PromoCard drop={drop} />
-                        ) : (
-                            <DropCard drop={drop} />
-                        )}
-                    </motion.div>
-                ))}
-            </AnimatePresence>
+            {drops.map((drop, index) => (
+                <div
+                    key={drop.id}
+                    className="animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-backwards"
+                    style={{ animationDelay: `${index * 50}ms` }}
+                >
+                    {(drop.type === 'promo' || drop.type === 'external') ? (
+                        <PromoCard drop={drop} />
+                    ) : (
+                        <DropCard drop={drop} priority={index < 4} />
+                    )}
+                </div>
+            ))}
         </div>
     );
 }

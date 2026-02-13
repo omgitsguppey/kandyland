@@ -14,10 +14,22 @@ import confetti from "canvas-confetti";
 
 interface DropCardProps {
     drop: Drop;
+    priority?: boolean;
 }
 
-function DropCardBase({ drop }: DropCardProps) {
+function DropCardBase({ drop, priority = false }: DropCardProps) {
     const { user, userProfile } = useAuth();
+    // ... (rest of the component logic remains effectively same, just update the image priority)
+
+    // ... inside return ...
+    <NextImage
+        src={drop.imageUrl}
+        alt={drop.title}
+        fill
+        priority={priority}
+        className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-70 group-hover:opacity-100"
+        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+    />
     const [timeLeft, setTimeLeft] = useState("");
     const [isHovered, setIsHovered] = useState(false);
     const [unlocking, setUnlocking] = useState(false);
@@ -191,8 +203,9 @@ function DropCardBase({ drop }: DropCardProps) {
                             src={drop.imageUrl}
                             alt={drop.title}
                             fill
+                            priority={priority} // Prioritize based on grid position
                             className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-70 group-hover:opacity-100"
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw" // Corrected: Mobile is 2-col (50vw), not 1-col
                         />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center text-5xl bg-zinc-900/50">🍬</div>

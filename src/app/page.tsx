@@ -1,7 +1,6 @@
 "use client";
 
 import Hero from "@/components/Hero";
-import BentoGrid from "@/components/BentoGrid";
 import { useDrops } from "@/hooks/useDrops";
 import { Loader2 } from "lucide-react";
 
@@ -17,17 +16,14 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-black selection:bg-brand-pink/30">
+    <div className="h-[calc(100vh-11rem)] md:h-[calc(100vh-5rem)] w-full overflow-hidden flex flex-col items-center justify-center">
 
-      {/* Hero Section */}
-      <Hero />
-
-      {/* Featured Drops (Bento Grid) */}
-      <div className="relative z-10 mt-20 md:-mt-20 pb-20">
-        <BentoGrid drops={drops} />
+      {/* Hero Section - Full Height */}
+      <div className="flex-1 flex items-center justify-center w-full">
+        <Hero />
       </div>
 
-    </main>
+    </div>
   );
 }
 

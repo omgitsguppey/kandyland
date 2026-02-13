@@ -2,11 +2,21 @@ export interface UserProfile {
     uid: string;
     email: string | null;
     displayName: string | null;
-    username?: string; // Explicit username
+    username?: string; // Explicit username (required by UI, optional in DB for initial auth)
     dateOfBirth?: string; // YYYY-MM-DD
     photoURL: string | null;
+    bannerUrl?: string; // Profile Banner
+    bio?: string; // Creator Bio
+    socialLinks?: {
+        twitter?: string;
+        instagram?: string;
+        website?: string;
+    };
+    role?: 'user' | 'creator' | 'admin'; // Default 'user'
+    isVerified?: boolean; // Verified Creator badge
     gumDropsBalance: number;
     unlockedContent: string[]; // Array of Drop IDs
+    following?: string[]; // Array of Creator UIDs
     createdAt: number; // Timestamp
     lastCheckIn?: number; // Timestamp of last daily reward claim
     streakCount?: number; // Current daily streak
@@ -16,6 +26,7 @@ export interface UserProfile {
 
 export interface Drop {
     id: string;
+    creatorId?: string; // Link to UserProfile.uid
     title: string;
     description: string;
     imageUrl: string;

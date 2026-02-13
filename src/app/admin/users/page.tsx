@@ -183,6 +183,30 @@ export default function UserManagementPage() {
         }
     };
 
+    // --- Role & Verification Management ---
+    const handleRoleUpdate = async (uid: string, newRole: 'user' | 'creator' | 'admin') => {
+        try {
+            await updateDoc(doc(db, "users", uid), { role: newRole });
+            // Update local state
+            setUsers(users.map(u => u.uid === uid ? { ...u, role: newRole } : u));
+            alert(`Role updated to ${newRole}`);
+        } catch (error) {
+            console.error(error);
+            alert("Failed to update role");
+        }
+    };
+
+    const handleVerification = async (uid: string, isVerified: boolean) => {
+        try {
+            await updateDoc(doc(db, "users", uid), { isVerified });
+            // Update local state
+            setUsers(users.map(u => u.uid === uid ? { ...u, isVerified } : u));
+        } catch (error) {
+            console.error(error);
+            alert("Failed to update verification");
+        }
+    };
+
     const getStatusColor = (status?: string) => {
         switch (status) {
             case 'banned': return 'text-red-500 bg-red-500/10 border-red-500/20';
@@ -196,7 +220,7 @@ export default function UserManagementPage() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold text-white mb-2">User Management</h1>
-                    <p className="text-gray-400">Manage user accounts, monitor activity, and enforce policies.</p>
+                    <p className="text-gray-400">Manage accounts, roles, balance, and content access.</p>
                 </div>
                 <div className="glass-panel px-4 py-2 rounded-xl flex items-center gap-2 text-sm font-mono text-gray-400">
                     <Shield className="w-4 h-4 text-brand-pink" />
@@ -216,13 +240,14 @@ export default function UserManagementPage() {
                 />
             </div>
 
-            {/* Users Table */}
-            <div className="glass-panel rounded-2xl overflow-hidden border border-white/5">
+            {/* Desktop Users Table */}
+            <div className="hidden md:block glass-panel rounded-2xl overflow-hidden border border-white/5">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead>
                             <tr className="border-b border-white/5 bg-white/5 text-gray-400 text-xs uppercase tracking-wider">
                                 <th className="p-4 font-medium">User</th>
+                                <th className="p-4 font-medium">Role</th>
                                 <th className="p-4 font-medium">Status</th>
                                 <th className="p-4 font-medium">Balance</th>
                                 <th className="p-4 font-medium">Joined</th>
@@ -232,13 +257,13 @@ export default function UserManagementPage() {
                         <tbody className="divide-y divide-white/5">
                             {loading ? (
                                 <tr>
-                                    <td colSpan={5} className="p-8 text-center">
+                                    <td colSpan={6} className="p-8 text-center">
                                         <Loader2 className="w-6 h-6 text-brand-pink animate-spin mx-auto" />
                                     </td>
                                 </tr>
                             ) : filteredUsers.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="p-8 text-center text-gray-500">
+                                    <td colSpan={6} className="p-8 text-center text-gray-500">
                                         No users found matching "{searchQuery}"
                                     </td>
                                 </tr>
@@ -255,10 +280,21 @@ export default function UserManagementPage() {
                                                     )}
                                                 </div>
                                                 <div>
-                                                    <div className="font-bold text-white">{user.displayName || "No Name"}</div>
+                                                    <div className="flex items-center gap-1 font-bold text-white">
+                                                        {user.displayName || "No Name"}
+                                                        {user.isVerified && <CheckCircle className="w-3 h-3 text-brand-cyan" />}
+                                                    </div>
                                                     <div className="text-xs text-gray-500">{user.email}</div>
                                                 </div>
                                             </div>
+                                        </td>
+                                        <td className="p-4">
+                                            <span className={`px-2 py-1 rounded-full text-xs font-bold border capitalize ${user.role === 'admin' ? "bg-red-500/10 text-red-400 border-red-500/20" :
+                                                    user.role === 'creator' ? "bg-purple-500/10 text-purple-400 border-purple-500/20" :
+                                                        "bg-gray-500/10 text-gray-400 border-gray-500/20"
+                                                }`}>
+                                                {user.role || 'user'}
+                                            </span>
                                         </td>
                                         <td className="p-4">
                                             <span className={`px-2 py-1 rounded-full text-xs font-bold border ${getStatusColor(user.status)}`}>
@@ -281,42 +317,55 @@ export default function UserManagementPage() {
                                             {format(user.createdAt, 'MMM d, yyyy')}
                                         </td>
                                         <td className="p-4 text-right">
-                                            <div className="flex items-center justify-end gap-2">
+                                            <div className="flex items-center justify-end gap-1">
+                                                {/* Role Toggles - Compact */}
+                                                {user.role !== 'creator' && (
+                                                    <button onClick={() => handleRoleUpdate(user.uid, 'creator')} className="p-1.5 hover:bg-purple-500/20 text-gray-400 hover:text-purple-400 rounded transition-colors" title="Promote"><Plus className="w-3 h-3" /></button>
+                                                )}
+                                                <button
+                                                    onClick={() => handleVerification(user.uid, !user.isVerified)}
+                                                    className={`p-1.5 rounded transition-colors ${user.isVerified ? "text-brand-cyan hover:bg-red-500/10 hover:text-red-400" : "text-gray-400 hover:text-brand-cyan"}`}
+                                                    title="Verify"
+                                                >
+                                                    <CheckCircle className="w-3 h-3" />
+                                                </button>
+
+                                                <div className="w-px h-4 bg-white/10 mx-1" />
+
                                                 {(!user.status || user.status === 'active') ? (
                                                     <>
                                                         <button
                                                             onClick={() => { setActionUser(user); setActionType('suspend'); }}
-                                                            className="p-2 rounded-lg hover:bg-orange-500/20 text-orange-500 transition-colors"
-                                                            title="Suspend User"
+                                                            className="p-1.5 rounded hover:bg-orange-500/20 text-gray-400 hover:text-orange-500 transition-colors"
+                                                            title="Suspend"
                                                         >
-                                                            <AlertTriangle className="w-4 h-4" />
+                                                            <AlertTriangle className="w-3 h-3" />
                                                         </button>
                                                         <button
                                                             onClick={() => { setActionUser(user); setActionType('ban'); }}
-                                                            className="p-2 rounded-lg hover:bg-red-500/20 text-red-500 transition-colors"
-                                                            title="Ban User"
+                                                            className="p-1.5 rounded hover:bg-red-500/20 text-gray-400 hover:text-red-500 transition-colors"
+                                                            title="Ban"
                                                         >
-                                                            <Ban className="w-4 h-4" />
+                                                            <Ban className="w-3 h-3" />
                                                         </button>
                                                     </>
                                                 ) : (
-                                                    <>
-                                                        <button
-                                                            onClick={() => setContentUser(user)}
-                                                            className="p-2 rounded-lg hover:bg-brand-purple/20 text-brand-purple transition-colors"
-                                                            title="Manage Unlocked Content"
-                                                        >
-                                                            <Lock className="w-4 h-4" />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => { setActionUser(user); setActionType('activate'); }}
-                                                            className="p-2 rounded-lg hover:bg-green-500/20 text-green-500 transition-colors"
-                                                            title="Reactivate User"
-                                                        >
-                                                            <CheckCircle className="w-4 h-4" />
-                                                        </button>
-                                                    </>
+                                                    <button
+                                                        onClick={() => { setActionUser(user); setActionType('activate'); }}
+                                                        className="p-1.5 rounded hover:bg-green-500/20 text-green-500 transition-colors"
+                                                        title="Reactivate"
+                                                    >
+                                                        <CheckCircle className="w-3 h-3" />
+                                                    </button>
                                                 )}
+
+                                                <button
+                                                    onClick={() => setContentUser(user)}
+                                                    className="p-1.5 rounded hover:bg-brand-purple/20 text-gray-400 hover:text-brand-purple transition-colors"
+                                                    title="Content"
+                                                >
+                                                    <Lock className="w-3 h-3" />
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -327,7 +376,69 @@ export default function UserManagementPage() {
                 </div>
             </div>
 
-            {/* Action Modal */}
+            {/* Mobile Card Layout */}
+            <div className="md:hidden flex flex-col divide-y divide-white/5 glass-panel rounded-2xl border border-white/5">
+                {loading ? (
+                    <div className="p-8 text-center"><Loader2 className="w-6 h-6 text-brand-pink animate-spin mx-auto" /></div>
+                ) : filteredUsers.length === 0 ? (
+                    <div className="p-8 text-center text-gray-500">No users found.</div>
+                ) : (
+                    filteredUsers.map((user) => (
+                        <div key={user.uid} className="p-4 flex gap-4 items-start">
+                            <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center text-lg font-bold text-gray-500 overflow-hidden shrink-0">
+                                {user.photoURL ? (
+                                    <img src={user.photoURL} alt={user.displayName || "User"} className="w-full h-full object-cover" />
+                                ) : (
+                                    (user.displayName?.[0] || user.email?.[0] || "?").toUpperCase()
+                                )}
+                            </div>
+                            <div className="flex-1 min-w-0 space-y-2">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <div className="flex items-center gap-1 font-bold text-white text-sm">
+                                            {user.displayName || "No Name"}
+                                            {user.isVerified && <CheckCircle className="w-3 h-3 text-brand-cyan" />}
+                                        </div>
+                                        <div className="text-xs text-gray-500">{user.email}</div>
+                                    </div>
+                                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border capitalize ${getStatusColor(user.status)}`}>
+                                        {user.status || 'active'}
+                                    </span>
+                                </div>
+
+                                <div className="flex items-center justify-between text-xs">
+                                    <span className={`px-1.5 py-0.5 rounded border capitalize ${user.role === 'admin' ? "bg-red-500/10 text-red-400 border-red-500/20" :
+                                            user.role === 'creator' ? "bg-purple-500/10 text-purple-400 border-purple-500/20" :
+                                                "bg-gray-500/10 text-gray-400 border-gray-500/20"
+                                        }`}>
+                                        {user.role || 'user'}
+                                    </span>
+                                    <div className="font-mono text-brand-pink flex items-center gap-1">
+                                        {user.gumDropsBalance} 🍬
+                                        <button onClick={() => { setEditBalanceUser(user); setNewBalance(user.gumDropsBalance.toString()); }}><Edit2 className="w-3 h-3 text-gray-500" /></button>
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-end gap-2 pt-2 border-t border-white/5">
+                                    {user.role !== 'creator' ? (
+                                        <button onClick={() => handleRoleUpdate(user.uid, 'creator')} className="px-3 py-1.5 bg-purple-500/10 text-purple-400 rounded-lg text-xs font-bold">Promote</button>
+                                    ) : (
+                                        <button onClick={() => handleRoleUpdate(user.uid, 'user')} className="px-3 py-1.5 bg-zinc-800 text-gray-400 rounded-lg text-xs font-bold">Demote</button>
+                                    )}
+
+                                    <button onClick={() => handleVerification(user.uid, !user.isVerified)} className={`px-3 py-1.5 rounded-lg text-xs font-bold ${user.isVerified ? "bg-brand-cyan/10 text-brand-cyan" : "bg-zinc-800 text-gray-400"}`}>
+                                        {user.isVerified ? "Verified" : "Verify"}
+                                    </button>
+
+                                    <button onClick={() => setContentUser(user)} className="p-1.5 bg-zinc-800 text-gray-400 rounded-lg"><Lock className="w-4 h-4" /></button>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+
+            {/* Action Modal (Same as existing, no changes needed here mostly but ensuring it closes properly) */}
             {(actionType || editBalanceUser) && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
                     {actionType && actionUser && (

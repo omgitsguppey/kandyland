@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { LayoutDashboard, PlusCircle, LogOut, Package, Users } from "lucide-react";
+import { LayoutDashboard, PlusCircle, LogOut, Package, Users, Terminal } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const ADMIN_EMAIL = "uylusjohnson@gmail.com";
@@ -98,6 +98,16 @@ export default function AdminLayout({
                             <Users className="w-5 h-5 text-gray-400 group-hover:text-brand-yellow transition-colors" />
                             <span className="font-medium">Users</span>
                         </Link>
+                        <div className="pt-4 mt-4 border-t border-white/10">
+                            <Link
+                                href="/admin/debug"
+                                className="flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/5 transition-colors group"
+                                onClick={() => setIsSidebarOpen(false)}
+                            >
+                                <Terminal className="w-5 h-5 text-gray-500 group-hover:text-brand-cyan transition-colors" />
+                                <span className="font-medium text-gray-400 group-hover:text-white">Debug Console</span>
+                            </Link>
+                        </div>
                     </nav>
                 </div>
 

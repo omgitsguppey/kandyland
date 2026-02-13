@@ -121,7 +121,7 @@ export function PurchaseModal({ isOpen, onClose }: PurchaseModalProps) {
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.95, opacity: 0, y: 20 }}
                         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                        className="relative w-full max-w-md bg-black/50 backdrop-blur-3xl rounded-3xl p-8 shadow-2xl border border-white/10 overflow-hidden"
+                        className="relative w-full max-w-md bg-black/50 backdrop-blur-3xl rounded-3xl p-6 md:p-8 shadow-2xl border border-white/10 overflow-hidden"
                     >
                         <button
                             onClick={onClose}
@@ -199,6 +199,7 @@ export function PurchaseModal({ isOpen, onClose }: PurchaseModalProps) {
                                                                 currency_code: "USD",
                                                                 value: selectedPackage.price.toString(),
                                                             },
+                                                            custom_id: `${user?.uid || 'guest'}:${selectedPackage.drops}`, // Pass UID for Webhook Verification
                                                         },
                                                     ],
                                                 });
@@ -217,9 +218,9 @@ export function PurchaseModal({ isOpen, onClose }: PurchaseModalProps) {
                                                 setError("PayPal encountered an error. Please try again.");
                                             }}
                                         />
-                                        <p className="text-[10px] text-gray-500 text-center mt-4 leading-tight">
-                                            By purchasing, you agree that Gum Drops are virtual items with no monetary value outside this platform.
-                                        </p>
+                                        <div className="text-[10px] text-gray-500 text-center mt-4 leading-tight">
+                                            By purchasing, you agree to our <a href="/terms" target="_blank" className="underline hover:text-white">Terms</a> and <a href="/privacy" target="_blank" className="underline hover:text-white">Privacy Policy</a>. Gum Drops are virtual items with no monetary value outside this platform.
+                                        </div>
                                     </div>
 
                                     {error && (
