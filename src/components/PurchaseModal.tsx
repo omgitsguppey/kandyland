@@ -168,7 +168,7 @@ export function PurchaseModal({ isOpen, onClose }: PurchaseModalProps) {
                                                     )}
                                                 >
                                                     {isPopular && (
-                                                        <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-brand-cyan to-blue-500 text-[10px] font-bold px-2 py-0.5 rounded-full text-white shadow-lg border border-white/10 tracking-wide uppercase">
+                                                        <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-brand-cyan to-blue-500 text-[8px] md:text-[10px] font-bold px-1.5 md:px-2 py-0.5 rounded-full text-white shadow-lg border border-white/10 tracking-wide uppercase whitespace-nowrap">
                                                             Best Value
                                                         </span>
                                                     )}

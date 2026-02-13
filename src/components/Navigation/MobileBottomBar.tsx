@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Grid, Wallet, Search } from "lucide-react";
+import { Home, Grid, Wallet, Search, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -13,19 +13,19 @@ export default function MobileBottomBar() {
     const { openPurchaseModal } = useUI();
 
     // Hide on desktop (md and up) and on admin pages
-    if (pathname.startsWith("/admin")) return null;
+    if (pathname?.startsWith("/admin")) return null;
 
     const navItems = [
         { label: "Home", href: "/", icon: Home },
-        { label: "Drops", href: "/#drops", icon: Grid },
-        { label: "Search", href: "/search", icon: Search },
+        { label: "Drops", href: "/drops", icon: Grid },
+        { label: "Experiences", href: "/experiences", icon: Sparkles },
     ];
 
     return (
         <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 p-4 pb-6 pointer-events-none">
             {/* Floating Balance Badge (Dynamic Island style) - Only if logged in */}
             {user && (
-                <div className="absolute bottom-24 left-1/2 -translate-x-1/2 pointer-events-auto">
+                <div className="absolute bottom-32 left-1/2 -translate-x-1/2 pointer-events-auto">
                     <button
                         onClick={openPurchaseModal}
                         className="bg-black/80 backdrop-blur-xl border border-brand-yellow/30 pl-3 pr-4 py-1.5 rounded-full flex items-center gap-2 shadow-[0_4px_20px_rgba(250,204,21,0.2)] animate-in slide-in-from-bottom-4 duration-500"
