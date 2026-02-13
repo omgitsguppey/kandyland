@@ -96,14 +96,67 @@ function ViewerContent() {
                 className="glass-panel p-1 rounded-3xl overflow-hidden border border-white/10 shadow-2xl relative"
                 onContextMenu={(e) => e.preventDefault()}
             >
-                <div className="relative aspect-video bg-black rounded-2xl overflow-hidden">
+                <div className="relative aspect-video bg-black rounded-2xl overflow-hidden flex items-center justify-center">
                     {drop.contentUrl ? (
-                        <img
-                            src={drop.contentUrl}
-                            alt="Secure Content"
-                            className="w-full h-full object-contain pointer-events-none select-none"
-                            draggable={false}
-                        />
+                        (() => {
+                            // Determine type from metadata or URL extension
+                            const type = drop.fileMetadata?.type || "";
+                            const url = drop.contentUrl;
+
+                            if (type.startsWith("video/") || url.match(/\.(mp4|webm|ogg)$/i)) {
+                                return (
+                                    <video
+                                        controls
+                                        controlsList="nodownload"
+                                        className="w-full h-full object-contain"
+                                        poster={drop.imageUrl}
+                                    >
+                                        <source src={url} type={type || "video/mp4"} />
+                                        Your browser does not support the video tag.
+                                    </video>
+                                );
+                            } else if (type.startsWith("audio/") || url.match(/\.(mp3|wav)$/i)) {
+                                return (
+                                    <div className="w-full h-full flex flex-col items-center justify-center p-8 bg-gradient-to-br from-gray-900 to-black">
+                                        <div className="w-32 h-32 rounded-full overflow-hidden mb-8 border-4 border-white/10 animate-[spin_10s_linear_infinite]">
+                                            <img src={drop.imageUrl} alt="Album Art" className="w-full h-full object-cover" />
+                                        </div>
+                                        <audio controls controlsList="nodownload" className="w-full max-w-md">
+                                            <source src={url} type={type || "audio/mpeg"} />
+                                            Your browser does not support the audio element.
+                                        </audio>
+                                    </div>
+                                );
+                            } else if (type.startsWith("image/") || url.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+                                return (
+                                    <img
+                                        src={url}
+                                        alt="Secure Content"
+                                        className="w-full h-full object-contain pointer-events-none select-none"
+                                        draggable={false}
+                                    />
+                                );
+                            } else {
+                                // Fallback for Zip / PDF / Other
+                                return (
+                                    <div className="flex flex-col items-center justify-center p-12 text-center">
+                                        <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mb-6">
+                                            <ShieldCheck className="w-8 h-8 text-brand-cyan" />
+                                        </div>
+                                        <h3 className="text-xl font-bold text-white mb-2">Ready to Download</h3>
+                                        <p className="text-gray-400 mb-6">This content is available for direct download.</p>
+                                        <a
+                                            href={url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="px-8 py-3 bg-brand-pink text-white font-bold rounded-full hover:bg-pink-600 transition-colors shadow-lg shadow-brand-pink/20"
+                                        >
+                                            Download File
+                                        </a>
+                                    </div>
+                                );
+                            }
+                        })()
                     ) : (
                         <div className="flex items-center justify-center h-full text-gray-500">
                             Content not available
