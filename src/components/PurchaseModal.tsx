@@ -17,10 +17,10 @@ interface PurchaseModalProps {
 }
 
 const PACKAGES = [
-    { drops: 100, price: 1.99, label: "Starter Pack" },
-    { drops: 300, price: 4.99, label: "Fan Pack" },
-    { drops: 700, price: 9.99, label: "Premium Stash" },
-    { drops: 1500, price: 19.99, label: "Ultimate Kandy" },
+    { drops: 100, price: 1.00, label: "Starter Pack" },
+    { drops: 550, price: 5.00, label: "Fan Pack (+50 Bonus)" },
+    { drops: 1100, price: 10.00, label: "Premium Stash (+100 Bonus)" },
+    { drops: 2500, price: 20.00, label: "Ultimate Kandy (+500 Bonus)" },
 ];
 
 export function PurchaseModal({ isOpen, onClose }: PurchaseModalProps) {

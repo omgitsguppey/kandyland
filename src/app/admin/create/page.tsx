@@ -31,7 +31,7 @@ function DropForm() {
         description: "",
         imageUrl: "",
         contentUrl: "",
-        unlockCost: 50,
+        unlockCost: 100,
         validFrom: formatForInput(defaultStart),
         validUntil: formatForInput(defaultEnd),
         // New Fields
